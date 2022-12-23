@@ -6,7 +6,6 @@
  *                                                                                           *
  ******************************************************************************************* */
 
-
 /**
  * Parses a rfc2822 string date representation into date value
  * For rfc2822 date specification refer to : http://tools.ietf.org/html/rfc2822#page-14
@@ -38,7 +37,6 @@ function parseDataFromIso8601(value) {
   return new Date(value);
 }
 
-
 /**
  * Returns true if specified date is leap year and false otherwise
  * Please find algorithm here: https://en.wikipedia.org/wiki/Leap_year#Algorithm
@@ -61,7 +59,6 @@ function isLeapYear(date) {
   return false;
 }
 
-
 /**
  * Returns the string representation of the timespan between two dates.
  * The format of output string is "HH:mm:ss.sss"
@@ -81,10 +78,13 @@ function timeSpanToString(startDate, endDate) {
   const hours = endDate.getHours() - startDate.getHours();
   const min = endDate.getMinutes() - startDate.getMinutes();
   const sec = endDate.getSeconds() - startDate.getSeconds();
-  const mSec = ((endDate - startDate) % 1000);
-  return `${hours.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${mSec.toString().padStart(3, '0')}`;
+  const mSec = (endDate - startDate) % 1000;
+  return `${hours.toString().padStart(2, '0')}:${min
+    .toString()
+    .padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${mSec
+    .toString()
+    .padStart(3, '0')}`;
 }
-
 
 /**
  * Returns the angle (in radians) between the hands of an analog clock
@@ -104,7 +104,7 @@ function timeSpanToString(startDate, endDate) {
  */
 function angleBetweenClockHands(date) {
   // const hours = date.getHours() >= 3 ? date.getHours() - 3 : 24 + date.getHours() - 3;
-  let res = 0.5 * ((60 * date.getHours()) - (11 * date.getMinutes()));
+  let res = 0.5 * (60 * date.getHours() - 11 * date.getMinutes());
   if (res > 180) {
     res = 360 - res;
     if (Math.abs(res) > 180) {
@@ -113,7 +113,6 @@ function angleBetweenClockHands(date) {
   }
   return (Math.PI * Math.abs(res)) / 180;
 }
-
 
 module.exports = {
   parseDataFromRfc2822,

@@ -20,8 +20,12 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  return {
+    width,
+    height,
+    getArea: () => width * height,
+  };
 }
 
 
@@ -35,8 +39,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 
@@ -51,8 +55,8 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  return Object.setPrototypeOf(JSON.parse(json), proto);
 }
 
 
@@ -111,32 +115,72 @@ function fromJSON(/* proto, json */) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  res: '',
+  countElement: 0,
+  countId: 0,
+  countClass: 0,
+  countAttr: 0,
+  countPseudoClass: 0,
+  countPseudoElement: 0,
+
+  element(value) {
+    if (this.countId > 0 || this.countClass > 0
+      || this.countAttr > 0 || this.countPseudoClass > 0
+      || this.countPseudoElement > 0) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    if (this.countElement > 0) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    return { ...this, res: `${this.res}${value}`, countElement: this.countElement + 1 };
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    if (this.countClass > 0 || this.countAttr > 0
+      || this.countPseudoClass > 0 || this.countPseudoElement > 0) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    if (this.countId > 0) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    return { ...this, res: `${this.res}#${value}`, countId: this.countId + 1 };
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    if (this.countAttr > 0 || this.countPseudoClass > 0
+      || this.countPseudoElement > 0) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    return { ...this, res: `${this.res}.${value}`, countClass: this.countClass + 1 };
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    if (this.countPseudoClass > 0 || this.countPseudoElement > 0) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    return { ...this, res: `${this.res}[${value}]`, countAttr: this.countAttr + 1 };
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    if (this.countPseudoElement > 0) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    return { ...this, res: `${this.res}:${value}`, countPseudoClass: this.countPseudoClass + 1 };
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    if (this.countPseudoElement > 0) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    return { ...this, res: `${this.res}::${value}`, countPseudoElement: this.countPseudoElement + 1 };
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    return { ...this, res: `${selector1.stringify()} ${combinator} ${selector2.stringify()}` };
+  },
+
+  stringify() {
+    return this.res;
   },
 };
 
